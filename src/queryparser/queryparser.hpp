@@ -73,7 +73,7 @@ extern int xydebug;
 #if ! defined XYSTYPE && ! defined XYSTYPE_IS_DECLARED
 union XYSTYPE
 {
-#line 44 "src/queryparser/queryparser.y"
+#line 51 "src/queryparser/queryparser.y"
 
     bool bval;
     int ival;
@@ -120,6 +120,9 @@ int xyparse (void);
   // Declare the scanner.
   XY_DECL;
 
-#line 124 "src/queryparser/queryparser.hpp"
+  // Allows other files to tell the query parser where the query came from.
+  void set_query_error_context(const char* context);
+
+#line 127 "src/queryparser/queryparser.hpp"
 
 #endif /* !YY_XY_SRC_QUERYPARSER_QUERYPARSER_HPP_INCLUDED  */

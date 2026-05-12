@@ -77,7 +77,7 @@
 #define yylloc          xylloc
 
 /* First part of user prologue.  */
-#line 14 "src/queryparser/queryparser.y"
+#line 17 "src/queryparser/queryparser.y"
 
     #include <set>
     #include <map>
@@ -88,6 +88,7 @@
     #include <variant>
     #include <regex>
     #include <cstring>
+    #include <cstdlib>
 
     #include "../utils/query.hpp"
     #include "../utils/condition.hpp"
@@ -103,7 +104,10 @@
 
     Query* parsed_query;
 
-#line 107 "src/queryparser/queryparser.cpp"
+    static std::string current_query_error_context = "unknown QueryGoal";
+    static std::string current_query_input = "";
+
+#line 111 "src/queryparser/queryparser.cpp"
 
 # ifndef YY_CAST
 #  ifdef __cplusplus
@@ -513,8 +517,8 @@ static const yytype_int8 yytranslate[] =
 /* YYRLINE[YYN] -- Source line where rule number YYN was defined.  */
 static const yytype_int8 yyrline[] =
 {
-       0,    71,    71,    73,    74,    76,    77,    78,    79,    81,
-      82,    84,    91,    98
+       0,    78,    78,    80,    81,    83,    84,    85,    86,    88,
+      89,    91,    98,   105
 };
 #endif
 
@@ -1723,71 +1727,71 @@ yyreduce:
     switch (yyn)
       {
   case 2: /* input: expr-or-null  */
-#line 71 "src/queryparser/queryparser.y"
+#line 78 "src/queryparser/queryparser.y"
                     { parsed_query = (yyvsp[0].query); }
-#line 1729 "src/queryparser/queryparser.cpp"
+#line 1733 "src/queryparser/queryparser.cpp"
     break;
 
   case 3: /* expr-or-null: expr  */
-#line 73 "src/queryparser/queryparser.y"
+#line 80 "src/queryparser/queryparser.y"
                    { (yyval.query) = (yyvsp[0].query); }
-#line 1735 "src/queryparser/queryparser.cpp"
+#line 1739 "src/queryparser/queryparser.cpp"
     break;
 
   case 4: /* expr-or-null: %empty  */
-#line 74 "src/queryparser/queryparser.y"
+#line 81 "src/queryparser/queryparser.y"
               { (yyval.query) = new Query(); }
-#line 1741 "src/queryparser/queryparser.cpp"
+#line 1745 "src/queryparser/queryparser.cpp"
     break;
 
   case 5: /* expr: '(' expr-no-pt ')'  */
-#line 76 "src/queryparser/queryparser.y"
+#line 83 "src/queryparser/queryparser.y"
                           { (yyval.query) = (yyvsp[-1].query); }
-#line 1747 "src/queryparser/queryparser.cpp"
+#line 1751 "src/queryparser/queryparser.cpp"
     break;
 
   case 6: /* expr: expr-no-pt  */
-#line 77 "src/queryparser/queryparser.y"
+#line 84 "src/queryparser/queryparser.y"
                  { (yyval.query) = (yyvsp[0].query); }
-#line 1753 "src/queryparser/queryparser.cpp"
+#line 1757 "src/queryparser/queryparser.cpp"
     break;
 
   case 7: /* expr: '(' name-no-pt ')'  */
-#line 78 "src/queryparser/queryparser.y"
+#line 85 "src/queryparser/queryparser.y"
                          { (yyval.query) = (yyvsp[-1].query); }
-#line 1759 "src/queryparser/queryparser.cpp"
+#line 1763 "src/queryparser/queryparser.cpp"
     break;
 
   case 8: /* expr: name-no-pt  */
-#line 79 "src/queryparser/queryparser.y"
+#line 86 "src/queryparser/queryparser.y"
                  { (yyval.query) = (yyvsp[0].query); }
-#line 1765 "src/queryparser/queryparser.cpp"
+#line 1769 "src/queryparser/queryparser.cpp"
     break;
 
   case 11: /* expr-and: expr KEY_AND expr  */
-#line 84 "src/queryparser/queryparser.y"
+#line 91 "src/queryparser/queryparser.y"
                             {
     (yyval.query) = new Query();
 
     (yyval.query)->query = make_pair((yyvsp[-2].query), (yyvsp[0].query));
     (yyval.query)->is_and = true;
 }
-#line 1776 "src/queryparser/queryparser.cpp"
+#line 1780 "src/queryparser/queryparser.cpp"
     break;
 
   case 12: /* expr-or: expr KEY_OR expr  */
-#line 91 "src/queryparser/queryparser.y"
+#line 98 "src/queryparser/queryparser.y"
                           {
     (yyval.query) = new Query();
 
     (yyval.query)->query = make_pair((yyvsp[-2].query), (yyvsp[0].query));
     (yyval.query)->is_and = false;
 }
-#line 1787 "src/queryparser/queryparser.cpp"
+#line 1791 "src/queryparser/queryparser.cpp"
     break;
 
   case 13: /* name-no-pt: STRNAME  */
-#line 98 "src/queryparser/queryparser.y"
+#line 105 "src/queryparser/queryparser.y"
                     {
     (yyval.query) = new Query();
     std::vector<std::string> v;
@@ -1878,11 +1882,11 @@ yyreduce:
 
     (yyval.query)->query = v;
 }
-#line 1882 "src/queryparser/queryparser.cpp"
+#line 1886 "src/queryparser/queryparser.cpp"
     break;
 
 
-#line 1886 "src/queryparser/queryparser.cpp"
+#line 1890 "src/queryparser/queryparser.cpp"
 
         default: break;
       }
@@ -2122,16 +2126,27 @@ yyreturnlab:
   return yyresult;
 }
 
-#line 189 "src/queryparser/queryparser.y"
+#line 196 "src/queryparser/queryparser.y"
 
 
 void set_input_query(const char* in);
 void end_scan(void);
 
+void set_query_error_context(const char* context) {
+    if (context != nullptr) {
+        current_query_error_context = context;
+    } else {
+        current_query_error_context = "unknown QueryGoal";
+    }
+}
+
 int parse_query(const char* in) {
-    set_input_query(in);
+    current_query_input = in ? in : "";
+
+    set_input_query(current_query_input.c_str());
     int rv = xyparse();
     end_scan();
+
     return rv;
 }
 
@@ -2140,13 +2155,19 @@ void xyerror(const char *s) {
         s += 14;
     }
 
-    cout << "\x1b[31mParse error\x1b[0m in query at line "
-         << xylloc.first_line
-         << ", column "
-         << xylloc.first_column
-         << ": "
-         << s
-         << endl;
+    cout << "\x1b[31mParse error\x1b[0m in query" << endl;
+    cout << "Source: " << current_query_error_context << endl;
+    cout << "Line: " << xylloc.first_line
+         << ", column: " << xylloc.first_column << endl;
+    cout << "Query text: " << current_query_input << endl;
+
+    if (xylloc.first_column > 0) {
+        cout << "            "
+             << string(xylloc.first_column - 1, ' ')
+             << "^" << endl;
+    }
+
+    cout << "Message: " << s << endl;
 
     exit(-1);
 }
