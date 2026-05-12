@@ -707,15 +707,34 @@ int yy_flex_debug = 0;
 #define YY_RESTORE_YY_MORE_OFFSET
 char *yytext;
 #line 1 "src/queryparser/queryparser-token.l"
-#line 4 "src/queryparser/queryparser-token.l"
-	#include <iostream>
-	#include <vector>
-	#include "../utils/query.hpp"
-	#include "queryparser.hpp"
+#line 5 "src/queryparser/queryparser-token.l"
+    #include <iostream>
+    #include <vector>
+    #include <cstring>
 
-	using namespace std;
-#line 718 "src/queryparser/queryparser-token.cpp"
-#line 719 "src/queryparser/queryparser-token.cpp"
+    #include "../utils/query.hpp"
+    #include "queryparser.hpp"
+
+    using namespace std;
+
+    static int current_line = 1;
+    static int current_column = 1;
+
+    #define YY_USER_ACTION                                      \
+        xylloc.first_line = current_line;                       \
+        xylloc.first_column = current_column;                   \
+        for (int i = 0; i < yyleng; ++i) {                      \
+            if (yytext[i] == '\n') {                            \
+                current_line++;                                 \
+                current_column = 1;                             \
+            } else {                                            \
+                current_column++;                               \
+            }                                                   \
+        }                                                       \
+        xylloc.last_line = current_line;                        \
+        xylloc.last_column = current_column - 1;
+#line 737 "src/queryparser/queryparser-token.cpp"
+#line 738 "src/queryparser/queryparser-token.cpp"
 
 #define INITIAL 0
 
@@ -932,9 +951,10 @@ YY_DECL
 		}
 
 	{
-#line 14 "src/queryparser/queryparser-token.l"
+#line 32 "src/queryparser/queryparser-token.l"
 
-#line 938 "src/queryparser/queryparser-token.cpp"
+
+#line 958 "src/queryparser/queryparser-token.cpp"
 
 	while ( /*CONSTCOND*/1 )		/* loops until end-of-file is reached */
 		{
@@ -993,41 +1013,44 @@ do_action:	/* This label is used only to access EOF actions. */
 
 case 1:
 YY_RULE_SETUP
-#line 15 "src/queryparser/queryparser-token.l"
-{return '(';}
+#line 34 "src/queryparser/queryparser-token.l"
+{ return '('; }
 	YY_BREAK
 case 2:
 YY_RULE_SETUP
-#line 16 "src/queryparser/queryparser-token.l"
-{return ')';}
+#line 35 "src/queryparser/queryparser-token.l"
+{ return ')'; }
 	YY_BREAK
 case 3:
 YY_RULE_SETUP
-#line 17 "src/queryparser/queryparser-token.l"
-{return KEY_AND;}
+#line 36 "src/queryparser/queryparser-token.l"
+{ return KEY_AND; }
 	YY_BREAK
 case 4:
 YY_RULE_SETUP
-#line 18 "src/queryparser/queryparser-token.l"
-{return KEY_OR;}
+#line 37 "src/queryparser/queryparser-token.l"
+{ return KEY_OR; }
 	YY_BREAK
 case 5:
 /* rule 5 can match eol */
 YY_RULE_SETUP
-#line 20 "src/queryparser/queryparser-token.l"
-; // whitespace
+#line 39 "src/queryparser/queryparser-token.l"
+; /* whitespace */
 	YY_BREAK
 case 6:
 YY_RULE_SETUP
-#line 22 "src/queryparser/queryparser-token.l"
-{xylval.sval = strdup(yytext); return STRNAME;}
+#line 41 "src/queryparser/queryparser-token.l"
+{
+                                    xylval.sval = strdup(yytext);
+                                    return STRNAME;
+                                }
 	YY_BREAK
 case 7:
 YY_RULE_SETUP
-#line 23 "src/queryparser/queryparser-token.l"
+#line 46 "src/queryparser/queryparser-token.l"
 ECHO;
 	YY_BREAK
-#line 1031 "src/queryparser/queryparser-token.cpp"
+#line 1054 "src/queryparser/queryparser-token.cpp"
 case YY_STATE_EOF(INITIAL):
 	yyterminate();
 
@@ -2032,13 +2055,22 @@ void yyfree (void * ptr )
 
 #define YYTABLES_NAME "yytables"
 
-#line 23 "src/queryparser/queryparser-token.l"
+#line 46 "src/queryparser/queryparser-token.l"
 
 
 void set_input_query(const char* in) {
-  yy_scan_string(in);
+    yy_scan_string(in);
+
+    current_line = 1;
+    current_column = 1;
+
+    xylloc.first_line = 1;
+    xylloc.last_line = 1;
+    xylloc.first_column = 1;
+    xylloc.last_column = 1;
 }
 
 void end_scan(void) {
     yy_delete_buffer(YY_CURRENT_BUFFER);
 }
+
