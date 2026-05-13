@@ -80,7 +80,7 @@ struct QueriedProperty {
 
 AchieveCondition parse_achieve_condition(std::string cond);
 
-QueriedProperty parse_select_expr(std::string expr);
+QueriedProperty parse_select_expr(std::string expr, std::string source_context);
 
 Context parse_context_condition(std::string condition);
 
