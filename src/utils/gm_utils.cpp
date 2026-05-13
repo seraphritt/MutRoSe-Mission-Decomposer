@@ -11,6 +11,7 @@
 using namespace std;
 
 int parse_query(const char* in);
+void set_query_error_context(const char* context);
 int parse_condition(const char* in);
 
 extern Query* parsed_query;
@@ -117,7 +118,7 @@ AchieveCondition parse_achieve_condition(string cond) {
     @ Input: The string representing the select expression
     @ Output: A QueriedProperty object generated from the select statement
 */ 
-QueriedProperty parse_select_expr(string expr) {
+QueriedProperty parse_select_expr(string expr, string source_context) {
     bool error = false;
 
     std::regex select_reg(select_regex_exp);
@@ -151,6 +152,7 @@ QueriedProperty parse_select_expr(string expr) {
     }
 
     getline(ss,aux,')');
+    set_query_error_context(source_context.c_str());
     parse_query(aux.c_str());
 
     q.query = parsed_query;
