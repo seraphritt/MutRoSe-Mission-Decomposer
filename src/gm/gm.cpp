@@ -306,7 +306,14 @@ void analyze_custom_props(map<string,string> custom_props, VertexData& v) {
             string aux = custom_props[queried_property_prop];
             std::transform(aux.begin(),aux.end(),aux.begin(),::tolower);
             if(aux.find("select")) {
-                v.custom_props[queried_property_prop] = parse_select_expr(custom_props[queried_property_prop]);
+               string query_context =
+			    "Query Goal [" + parse_goal_text(v.text).first + "] "
+			    "node id [" + v.id + "] "
+			    "text [" + v.text + "] "
+			    "property [" + queried_property_prop + "] "
+			    "value [" + custom_props[queried_property_prop] + "]";
+			v.custom_props[queried_property_prop] =
+			    parse_select_expr(custom_props[queried_property_prop], query_context);
             } else {
                 string missing_select_statement_error = "Missing select statement in Query Goal [" + parse_goal_text(v.text).first + "]";
 
