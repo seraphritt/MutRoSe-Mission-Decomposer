@@ -9,6 +9,9 @@
 
   // Declare the scanner.
   XY_DECL;
+
+  // Allows other files to tell the query parser where the query came from.
+  void set_query_error_context(const char* context);
 }
 
 %{
@@ -21,6 +24,7 @@
     #include <variant>
     #include <regex>
     #include <cstring>
+    #include <cstdlib>
 
     #include "../utils/query.hpp"
     #include "../utils/condition.hpp"
@@ -35,6 +39,9 @@
     void xyerror(const char *s);
 
     Query* parsed_query;
+
+    static std::string current_query_error_context = "unknown QueryGoal";
+    static std::string current_query_input = "";
 %}
 
 %locations
@@ -191,10 +198,21 @@ name-no-pt: STRNAME {
 void set_input_query(const char* in);
 void end_scan(void);
 
+void set_query_error_context(const char* context) {
+    if (context != nullptr) {
+        current_query_error_context = context;
+    } else {
+        current_query_error_context = "unknown QueryGoal";
+    }
+}
+
 int parse_query(const char* in) {
-    set_input_query(in);
+    current_query_input = in ? in : "";
+
+    set_input_query(current_query_input.c_str());
     int rv = xyparse();
     end_scan();
+
     return rv;
 }
 
@@ -203,13 +221,19 @@ void xyerror(const char *s) {
         s += 14;
     }
 
-    cout << "\x1b[31mParse error\x1b[0m in query at line "
-         << xylloc.first_line
-         << ", column "
-         << xylloc.first_column
-         << ": "
-         << s
-         << endl;
+    cout << "\x1b[31mParse error\x1b[0m in query" << endl;
+    cout << "Source: " << current_query_error_context << endl;
+    cout << "Line: " << xylloc.first_line
+         << ", column: " << xylloc.first_column << endl;
+    cout << "Query text: " << current_query_input << endl;
+
+    if (xylloc.first_column > 0) {
+        cout << "            "
+             << string(xylloc.first_column - 1, ' ')
+             << "^" << endl;
+    }
+
+    cout << "Message: " << s << endl;
 
     exit(-1);
 }
