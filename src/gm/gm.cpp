@@ -68,12 +68,12 @@ void check_gm_validity(GMGraph gm) {
     vector<int> vctr = get_dfs_gm_nodes(gm);
 
     map<string,string> declared_vars;
-
+    std::cout << "Current visited node\n" << std::endl;  
     for(int v : vctr) {
         string goal_type = get<string>(gm[v].custom_props[goal_type_prop]);
 
-        std::cout << "Current visited node\n";        
-        std::cout << get_node_name(gm[v].text);
+        std::cout << "Current visited node\n" << std::endl;         
+        std::cout << get_node_name(gm[v].text) << std::endl;
 
         vector<pair<string,string>> monitored_vars;
         if(holds_alternative<vector<pair<string,string>>>(gm[v].custom_props[monitors_prop])) {
