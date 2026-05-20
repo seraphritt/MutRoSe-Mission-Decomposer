@@ -72,6 +72,9 @@ void check_gm_validity(GMGraph gm) {
     for(int v : vctr) {
         string goal_type = get<string>(gm[v].custom_props[goal_type_prop]);
 
+        std::cout << "Current visited node\n";        
+        std::cout << get_node_name(gm[v].text);
+
         vector<pair<string,string>> monitored_vars;
         if(holds_alternative<vector<pair<string,string>>>(gm[v].custom_props[monitors_prop])) {
             monitored_vars = std::get<vector<pair<string,string>>>(gm[v].custom_props[monitors_prop]);
