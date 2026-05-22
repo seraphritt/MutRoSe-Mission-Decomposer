@@ -16,19 +16,44 @@ using namespace std;
 
 /*
     Function: get_dfs_gm_nodes
-    Objective: Go through the GM using DFS and return nodes in the order they are visited
+    Objective: Go through the GM using DFS considering the first node as the one that doesn't have a parent and return nodes in the order they are visited
 
     @ Input 1: The GMGraph representing the GM
     @ Output: The vertices indexes based on DFS visit
 */  
 vector<int> get_dfs_gm_nodes(GMGraph gm) {
+    int root_node = find_gm_root_node(gm);
+
     auto indexmap = boost::get(boost::vertex_index, gm);
     auto colormap = boost::make_vector_property_map<boost::default_color_type>(indexmap);
 
     DFSVisitor vis;
-    boost::depth_first_search(gm, vis, colormap, 0);
+    boost::depth_first_search(gm, vis, colormap, boost::vertex(root_node, gm));
 
     return vis.GetVector();
+}
+
+int find_gm_root_node(GMGraph gm) {
+    int root_node = -1;
+
+    GMGraph::vertex_iterator v, vend;
+    for(boost::tie(v, vend) = vertices(gm); v != vend; ++v) {
+        int index = *v;
+
+        if(gm[index].parent == -1) {
+            if(root_node != -1) {
+                throw std::runtime_error("Multiple GM root nodes found. More than one node has parent = -1.");
+            }
+
+            root_node = index;
+        }
+    }
+
+    if(root_node == -1) {
+        throw std::runtime_error("No GM root node found. No node has parent = -1.");
+    }
+
+    return root_node;
 }
 
 bool exists_path(int source, int target, GMGraph gm) {
