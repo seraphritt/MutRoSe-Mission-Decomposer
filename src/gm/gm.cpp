@@ -90,120 +90,197 @@ bool exists_path(int source, int target, GMGraph gm) {
     @ Output: Void. We only throw errors
 */ 
 void check_gm_validity(GMGraph gm) {
-    vector<int> vctr = get_dfs_gm_nodes(gm);
 
-    map<string,string> declared_vars;  
-    for(int v : vctr) {
-        string goal_type = get<string>(gm[v].custom_props[goal_type_prop]);
-
-        std::cout << "Current visited node\n" << std::endl;         
-        std::cout << get_node_name(gm[v].text) << std::endl;
-        std::cout << "Parent node" << std::endl;
-        std::cout << gm[v].parent << std::endl;
-
-        vector<pair<string,string>> monitored_vars;
-        if(holds_alternative<vector<pair<string,string>>>(gm[v].custom_props[monitors_prop])) {
-            monitored_vars = std::get<vector<pair<string,string>>>(gm[v].custom_props[monitors_prop]);
+    map<string,string> declared_vars;
+  
+    /*
+      PASS 1:
+      Collect every variable declared in Controls.
+      Controls are global, so traversal order does not matter.
+    */
+    GMGraph::vertex_iterator v_it, vend;
+  
+    for(boost::tie(v_it, vend) = vertices(gm); v_it != vend; ++v_it) {
+      int v = *v_it;
+  
+      vector<pair<string,string>> controlled_vars;
+  
+      auto controls_it = gm[v].custom_props.find(controls_prop);
+  
+      if(controls_it != gm[v].custom_props.end() &&
+         holds_alternative<vector<pair<string,string>>>(controls_it->second)) {
+        controlled_vars = std::get<vector<pair<string,string>>>(controls_it->second);
+      }
+  
+      for(pair<string,string> var : controlled_vars) {
+        if(declared_vars.find(var.first) == declared_vars.end()) {
+          declared_vars[var.first] = var.second;
+        } else {
+          string var_redeclaration_error =
+            "Redeclaration of variable [" + var.first + "] in goal " +
+            get_node_name(gm[v].text);
+  
+          throw std::runtime_error(var_redeclaration_error);
         }
-
-        pair<bool,pair<string,string>> undeclared_var;
-        undeclared_var.first = false;
-        
-        for(pair<string,string> var : monitored_vars) {
-            if(declared_vars.find(var.first) == declared_vars.end()) {
-                undeclared_var.first = true;
-                undeclared_var.second = var;
-            }
-        }
-
-        if(undeclared_var.first) {
-            string undeclared_variable_error = "Undeclared variable [" + undeclared_var.second.first + "] of type [" + undeclared_var.second.second + "] in goal " + get_node_name(gm[v].text);
-
-            throw std::runtime_error(undeclared_variable_error);
-        }
-
-        vector<pair<string,string>> controlled_vars;
-        if(holds_alternative<vector<pair<string,string>>>(gm[v].custom_props[controls_prop])) {
-            controlled_vars = std::get<vector<pair<string,string>>>(gm[v].custom_props[controls_prop]);
-        }
-
-        for(pair<string,string> var : controlled_vars) {
-            if(declared_vars.find(var.first) == declared_vars.end()) {
-                declared_vars[var.first] = var.second;
-            } else {
-                string var_redeclaration_error = "Redeclaration of variable [" + var.first + "] in goal " + get_node_name(gm[v].text);
-
-                throw std::runtime_error(var_redeclaration_error); 
-            }
-        }
-
-        if(goal_type == achieve_goal_type) {
-            AchieveCondition ac = std::get<AchieveCondition>(gm[v].custom_props[achieve_condition_prop]);
-            
-            if(ac.has_forAll_expr) {
-                bool found_iterated_var = false;
-                for(auto monitored : monitored_vars) {
-                    if(monitored.first == ac.get_iterated_var()) {
-                        found_iterated_var = true;
-                        break;
-                    }
-                }
-                if(!found_iterated_var) {
-                    string iterated_var_err = "Did not find iterated variable " + ac.get_iterated_var() + " in " + get_node_name(gm[v].text) + "'s controlled variables list";
-                    throw std::runtime_error(iterated_var_err);
-                }
-
-                bool found_iteration_var = false;
-                for(auto controlled : controlled_vars) {
-                    if(controlled.first == ac.get_iteration_var()) {
-                        found_iteration_var = true;
-                        break;
-                    }
-                }
-                if(!found_iteration_var) {
-                    string iteration_var_err = "Did not find iteration variable " + ac.get_iteration_var() + " in " + get_node_name(gm[v].text) + "'s monitored variables list";
-                    throw std::runtime_error(iteration_var_err);
-                }
-            }
-        } else if(goal_type == query_goal_type) {
-            QueriedProperty qp = std::get<QueriedProperty>(gm[v].custom_props[queried_property_prop]);
-
-            if(controlled_vars.size() == 0) {
-                string no_controlled_variable_error = "No controlled variable was declared for Query goal [" + get_node_name(gm[v].text) + "]";
-
-		        throw std::runtime_error(no_controlled_variable_error);
-            }
-
-            string first_controlled_var_type = controlled_vars.at(0).second;
-            if(parse_gm_var_type(first_controlled_var_type) == "COLLECTION") {
-                first_controlled_var_type = first_controlled_var_type.substr(first_controlled_var_type.find("(")+1,first_controlled_var_type.find(")")-first_controlled_var_type.find("(")-1);
-            }
-
-            if(qp.query_var.second != first_controlled_var_type) {
-                string wrong_type_controlled_var = "Query variable [" + qp.query_var.first + "] type + [" + qp.query_var.second + "] is different than the base type of the first controlled variable [" + controlled_vars.at(0).first + "] ([" + first_controlled_var_type + "])";
-
-                throw std::runtime_error(wrong_type_controlled_var);
-            }
-        }
-
-        if(goal_type != achieve_goal_type) {
-            if(gm[v].custom_props.find(achieve_condition_prop) != gm[v].custom_props.end()) {
-                string achieve_condition_error = "Goal of type " + goal_type + " cannot contain an Achieve Condition";
-
-                throw std::runtime_error(achieve_condition_error);
-            }
-        }
-
-        if(goal_type != query_goal_type) {
-            if(gm[v].custom_props.find(queried_property_prop) != gm[v].custom_props.end()) {
-                string queried_property_error = "Goal of type " + goal_type + " cannot contain a Queried Property";
-
-                throw std::runtime_error(queried_property_error);
-            }
-        }
+      }
     }
-}
-
+  
+    /*
+      PASS 2:
+      Validate every monitor against the global Controls map.
+      Also keep the existing achieve/query checks.
+    */
+    for(boost::tie(v_it, vend) = vertices(gm); v_it != vend; ++v_it) {
+      int v = *v_it;
+  
+      string goal_type = get<string>(gm[v].custom_props[goal_type_prop]);
+  
+      std::cout << "Current visited node\n" << std::endl;
+      std::cout << get_node_name(gm[v].text) << std::endl;
+      std::cout << "Parent node" << std::endl;
+      std::cout << gm[v].parent << std::endl;
+  
+      vector<pair<string,string>> monitored_vars;
+  
+      auto monitors_it = gm[v].custom_props.find(monitors_prop);
+  
+      if(monitors_it != gm[v].custom_props.end() &&
+         holds_alternative<vector<pair<string,string>>>(monitors_it->second)) {
+        monitored_vars = std::get<vector<pair<string,string>>>(monitors_it->second);
+      }
+  
+      for(pair<string,string> var : monitored_vars) {
+        auto declared_it = declared_vars.find(var.first);
+  
+        if(declared_it == declared_vars.end()) {
+          string undeclared_variable_error =
+            "Undeclared variable [" + var.first + "] of type [" +
+            var.second + "] in goal " + get_node_name(gm[v].text);
+  
+          throw std::runtime_error(undeclared_variable_error);
+        }
+  
+        if((declared_it->second != var.second) && (var.second != "")) {
+          string wrong_type_error =
+            "Variable [" + var.first + "] in goal " +
+            get_node_name(gm[v].text) +
+            " is monitored as type [" + var.second +
+            "] but was declared in Controls as type [" +
+            declared_it->second + "]";
+  
+          throw std::runtime_error(wrong_type_error);
+        }
+      }
+  
+      vector<pair<string,string>> controlled_vars;
+  
+      auto controls_it = gm[v].custom_props.find(controls_prop);
+  
+      if(controls_it != gm[v].custom_props.end() &&
+         holds_alternative<vector<pair<string,string>>>(controls_it->second)) {
+        controlled_vars = std::get<vector<pair<string,string>>>(controls_it->second);
+      }
+  
+      if(goal_type == achieve_goal_type) {
+        AchieveCondition ac =
+          std::get<AchieveCondition>(gm[v].custom_props[achieve_condition_prop]);
+  
+        if(ac.has_forAll_expr) {
+          bool found_iterated_var = false;
+  
+          for(auto monitored : monitored_vars) {
+            if(monitored.first == ac.get_iterated_var()) {
+              found_iterated_var = true;
+              break;
+            }
+          }
+  
+          if(!found_iterated_var) {
+            string iterated_var_err =
+              "Did not find iterated variable " +
+              ac.get_iterated_var() + " in " +
+              get_node_name(gm[v].text) + "'s monitored variables list";
+  
+            throw std::runtime_error(iterated_var_err);
+          }
+  
+          bool found_iteration_var = false;
+  
+          for(auto controlled : controlled_vars) {
+            if(controlled.first == ac.get_iteration_var()) {
+              found_iteration_var = true;
+              break;
+            }
+          }
+  
+          if(!found_iteration_var) {
+            string iteration_var_err =
+              "Did not find iteration variable " +
+              ac.get_iteration_var() + " in " +
+              get_node_name(gm[v].text) + "'s controlled variables list";
+  
+            throw std::runtime_error(iteration_var_err);
+          }
+        }
+  
+      } else if(goal_type == query_goal_type) {
+        QueriedProperty qp =
+          std::get<QueriedProperty>(gm[v].custom_props[queried_property_prop]);
+  
+        if(controlled_vars.size() == 0) {
+          string no_controlled_variable_error =
+            "No controlled variable was declared for Query goal [" +
+            get_node_name(gm[v].text) + "]";
+  
+          throw std::runtime_error(no_controlled_variable_error);
+        }
+  
+        string first_controlled_var_type = controlled_vars.at(0).second;
+  
+        if(parse_gm_var_type(first_controlled_var_type) == "COLLECTION") {
+          first_controlled_var_type =
+            first_controlled_var_type.substr(
+              first_controlled_var_type.find("(") + 1,
+              first_controlled_var_type.find(")") -
+              first_controlled_var_type.find("(") - 1
+            );
+        }
+  
+        if(qp.query_var.second != first_controlled_var_type) {
+          string wrong_type_controlled_var =
+            "Query variable [" + qp.query_var.first +
+            "] type + [" + qp.query_var.second +
+            "] is different than the base type of the first controlled variable [" +
+            controlled_vars.at(0).first + "] ([" +
+            first_controlled_var_type + "])";
+  
+          throw std::runtime_error(wrong_type_controlled_var);
+        }
+      }
+  
+      if(goal_type != achieve_goal_type) {
+        if(gm[v].custom_props.find(achieve_condition_prop) !=
+           gm[v].custom_props.end()) {
+          string achieve_condition_error =
+            "Goal of type " + goal_type +
+            " cannot contain an Achieve Condition";
+  
+          throw std::runtime_error(achieve_condition_error);
+        }
+      }
+  
+      if(goal_type != query_goal_type) {
+        if(gm[v].custom_props.find(queried_property_prop) !=
+           gm[v].custom_props.end()) {
+          string queried_property_error =
+            "Goal of type " + goal_type +
+            " cannot contain a Queried Property";
+  
+          throw std::runtime_error(queried_property_error);
+        }
+      }
+    }
+  }
 /*
     Function: find_gm_node_by_id
     Objective: Find a vertex in the GMGraph given its user-defined ID
