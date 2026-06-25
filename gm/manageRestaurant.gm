@@ -332,7 +332,7 @@
           "customProperties": {
             "Description": "",
             "GoalType": "Query",
-            "QueriedProperty": "world_db->select(c:Client|c.clientWantsToOrder && !c.clientIsWaitingTable)",
+            "QueriedProperty": "world_db->select(c:Client|c.clientWantsToOrder)",
             "Controls": "clients_wanting_to_order : Sequence(Client)"
           }
         },
