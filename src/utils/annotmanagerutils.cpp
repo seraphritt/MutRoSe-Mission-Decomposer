@@ -165,7 +165,22 @@ void recursive_at_instances_renaming(general_annot* rannot, map<string,int>& at_
                     aux.push_back(at);
                 }
             }
+        if (aux.empty()) {
+          std::string msg =
+              "No generated HDDL instance found for GM task id '" + at_id_name.first +
+              "' / HDDL task '" + at_id_name.second +
+              "'. Check var_mapping, HDDL preconditions, semantic_mapping, and world_db.";
+          throw std::runtime_error(msg);
+        }
 
+        if (at_instances_counter[at_id_name.first] >= aux.size()) {
+            std::string msg =
+                "Not enough generated HDDL instances for GM task id '" + at_id_name.first +
+                "' / HDDL task '" + at_id_name.second +
+                "'. Needed index " + std::to_string(at_instances_counter[at_id_name.first]) +
+                ", but only " + std::to_string(aux.size()) + " instance(s) exist.";
+            throw std::runtime_error(msg);
+        }
             rannot->content = aux.at(at_instances_counter[at_id_name.first]).id;
 
             at_instances_counter[at_id_name.first]++;
