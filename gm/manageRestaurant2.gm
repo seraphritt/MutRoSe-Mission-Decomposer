@@ -1,0 +1,636 @@
+{
+  "actors": [
+    {
+      "id": "9ecade56-eeef-4cde-9585-810678749b10",
+      "text": "M1: Manage restaurant",
+      "type": "istar.Actor",
+      "x": 42,
+      "y": 24,
+      "customProperties": {
+        "Description": ""
+      },
+      "nodes": [
+        {
+          "id": "276dcd56-d179-4aac-9481-0d5fadb83d6e",
+          "text": "G1: Take order from client",
+          "type": "istar.Goal",
+          "x": 970,
+          "y": 419,
+          "customProperties": {
+            "Description": "",
+            "Monitors": "client : Client"
+          }
+        },
+        {
+          "id": "3707617c-9f76-453e-9e5c-34fffdecbcae",
+          "text": "G2: Cook the order",
+          "type": "istar.Goal",
+          "x": 1088,
+          "y": 419,
+          "customProperties": {
+            "Description": "",
+            "Monitors": "order : Order"
+          }
+        },
+        {
+          "id": "7fb87fe1-2eb0-422b-9a23-7caf61503015",
+          "text": "G3: Serve the order",
+          "type": "istar.Goal",
+          "x": 1200,
+          "y": 414,
+          "customProperties": {
+            "Description": "",
+            "Monitors": "order : Order"
+          }
+        },
+        {
+          "id": "9c364468-2414-4b4e-914f-1cc9c07e4a48",
+          "text": "G4: Clean all the dirty tables",
+          "type": "istar.Goal",
+          "x": 73,
+          "y": 258,
+          "customProperties": {
+            "Description": ""
+          }
+        },
+        {
+          "id": "8dfdab47-2ac3-4d21-b353-c451e26ca6ff",
+          "text": "G7: Manage order",
+          "type": "istar.Goal",
+          "x": 778,
+          "y": 265,
+          "customProperties": {
+            "Description": ""
+          }
+        },
+        {
+          "id": "a983cdab-d08c-4156-9d1b-65ecd0062041",
+          "text": "G8: Lead the client to table",
+          "type": "istar.Goal",
+          "x": 507,
+          "y": 246,
+          "customProperties": {
+            "Description": "",
+            "GoalType": "Achieve",
+            "AchieveCondition": "clients_waiting_for_table->forAll(client_to_guide|!client_to_guide.clientIsWaitingTable)",
+            "Monitors": "clients_waiting_for_table : Sequence(Client)",
+            "Controls": "client_to_guide : Client"
+          }
+        },
+        {
+          "id": "e4638527-5db9-4de2-a531-2f1a2ab3a511",
+          "text": "G12: Manage hall",
+          "type": "istar.Goal",
+          "x": 387,
+          "y": 82,
+          "customProperties": {
+            "Description": ""
+          }
+        },
+        {
+          "id": "9af17d1d-1c2f-41d6-902f-e42bbcc29e98",
+          "text": "G13: Clean the bathrooms",
+          "type": "istar.Goal",
+          "x": 252,
+          "y": 257,
+          "customProperties": {
+            "Description": ""
+          }
+        },
+        {
+          "id": "5a4a1465-b989-4114-ad11-e7cdfe20d769",
+          "text": "G14: Lead client to a clean empty table",
+          "type": "istar.Goal",
+          "x": 576,
+          "y": 339,
+          "customProperties": {
+            "Description": ""
+          }
+        },
+        {
+          "id": "d61aacc7-30da-4446-9b64-f6f42ce8b02d",
+          "text": "G15: Lead client to reserved table",
+          "type": "istar.Goal",
+          "x": 422,
+          "y": 347,
+          "customProperties": {
+            "Description": ""
+          }
+        },
+        {
+          "id": "3ef89b5f-c62d-4dec-9f96-2601238856be",
+          "text": "G16: Search tables to clean",
+          "type": "istar.Goal",
+          "x": 42,
+          "y": 331,
+          "customProperties": {
+            "Description": "",
+            "GoalType": "Query",
+            "QueriedProperty": "world_db->select(t:Table|!t.occupied && !t.tableIsClean)",
+            "Controls": "tables_to_clean : Sequence(Table)"
+          }
+        },
+        {
+          "id": "7a981b23-0acd-4e7e-8bef-fee541208b14",
+          "text": "G17: Clean dirty table",
+          "type": "istar.Goal",
+          "x": 164,
+          "y": 338,
+          "customProperties": {
+            "Description": "",
+            "GoalType": "Achieve",
+            "AchieveCondition": "tables_to_clean->forAll(table|)",
+            "Monitors": "tables_to_clean : Sequence(Table)",
+            "Controls": "table : Table"
+          }
+        },
+        {
+          "id": "a714c3ae-afba-481f-843c-8c1f2e653f6f",
+          "text": "G18: Take off the dirty dishes",
+          "type": "istar.Goal",
+          "x": 102,
+          "y": 404,
+          "customProperties": {
+            "Description": "",
+            "Monitors": "table"
+          }
+        },
+        {
+          "id": "90f20c7e-10ee-4d3e-ad8a-d08f6fd14ab9",
+          "text": "G19: Wipe the table",
+          "type": "istar.Goal",
+          "x": 232,
+          "y": 405,
+          "customProperties": {
+            "Description": "",
+            "Monitors": "table"
+          }
+        },
+        {
+          "id": "d0dc06a3-e584-4150-934b-eb14f700ce6b",
+          "text": "G20: Search for reserved table",
+          "type": "istar.Goal",
+          "x": 355,
+          "y": 439,
+          "customProperties": {
+            "Description": "",
+            "GoalType": "Query",
+            "QueriedProperty": "world_db->select(t:Table|!t.occupied && t.tableIsClean && t.tableIsReserved)",
+            "Controls": "table_reserved : Table"
+          }
+        },
+        {
+          "id": "da067380-cb98-4512-bae1-a2d91ba9b36d",
+          "text": "G21: Search for a clean empty table",
+          "type": "istar.Goal",
+          "x": 623,
+          "y": 439,
+          "customProperties": {
+            "Description": "",
+            "GoalType": "Query",
+            "QueriedProperty": "world_db->select(t:Table|!t.occupied && t.tableIsClean && !t.tableIsReserved)",
+            "Controls": "free_table : Table"
+          }
+        },
+        {
+          "id": "17ef58d0-21f0-4cd4-84ed-f4f6e06a8e5a",
+          "text": "G22: Guide the client",
+          "type": "istar.Goal",
+          "x": 499,
+          "y": 437,
+          "customProperties": {
+            "Description": "",
+            "Monitors": "table_reserved, client_to_guide"
+          }
+        },
+        {
+          "id": "e13d5569-fbae-4324-acac-da306bc06240",
+          "text": "G23: Guide the client",
+          "type": "istar.Goal",
+          "x": 762,
+          "y": 449,
+          "customProperties": {
+            "Description": "",
+            "Monitors": "free_table, client_to_guide"
+          }
+        },
+        {
+          "id": "6abf89bc-127c-43b3-a377-1e0707b81cb3",
+          "text": "G24: Search for clients who are waiting for table",
+          "type": "istar.Goal",
+          "x": 389,
+          "y": 245,
+          "customProperties": {
+            "Description": "",
+            "GoalType": "Query",
+            "QueriedProperty": "world_db->select(c:Client|c.clientIsWaitingTable)",
+            "Controls": "clients_waiting_for_table : Sequence(Client)"
+          }
+        },
+        {
+          "id": "753da51e-d2d7-4ad8-8d67-ba72a785a7d6",
+          "text": "G25: Manage Cleaning",
+          "type": "istar.Goal",
+          "x": 194,
+          "y": 188,
+          "customProperties": {
+            "Description": ""
+          }
+        },
+        {
+          "id": "7b84568f-e8df-4721-b79b-dafb6eaa6737",
+          "text": "G26: Manage Client",
+          "type": "istar.Goal",
+          "x": 519,
+          "y": 163,
+          "customProperties": {
+            "Description": ""
+          }
+        },
+        {
+          "id": "114ed2ca-087c-4c75-ad48-cb3f099969ce",
+          "text": "AT1: WipeTable",
+          "type": "istar.Task",
+          "x": 228,
+          "y": 482,
+          "customProperties": {
+            "Params": "table"
+          }
+        },
+        {
+          "id": "70b14b88-d303-449c-8ab8-3b226fe7665b",
+          "text": "AT2: TakeOffDishes",
+          "type": "istar.Task",
+          "x": 100,
+          "y": 484,
+          "customProperties": {
+            "Description": "",
+            "Params": "table"
+          }
+        },
+        {
+          "id": "88bcd340-cb15-41d4-91a4-057a1c8e3311",
+          "text": "AT3: GuideClient",
+          "type": "istar.Task",
+          "x": 501,
+          "y": 525,
+          "customProperties": {
+            "Description": "",
+            "Params": "table_reserved, client_to_guide"
+          }
+        },
+        {
+          "id": "03357ebd-c036-4884-9f34-0fb2278623d0",
+          "text": "AT4: GuideClient",
+          "type": "istar.Task",
+          "x": 763,
+          "y": 520,
+          "customProperties": {
+            "Description": "",
+            "Params": "free_table, client_to_guide"
+          }
+        },
+        {
+          "id": "ed725278-1f2c-4ab4-be26-68091205bda8",
+          "text": "AT5: TakeOrder",
+          "type": "istar.Task",
+          "x": 967,
+          "y": 478,
+          "customProperties": {
+            "Description": "",
+            "Params": "client"
+          }
+        },
+        {
+          "id": "dcf3237d-6ebb-4db1-9a76-4d2ce9d10414",
+          "text": "AT6: ServeOrder",
+          "type": "istar.Task",
+          "x": 1200,
+          "y": 476,
+          "customProperties": {
+            "Description": "",
+            "Params": "order"
+          }
+        },
+        {
+          "id": "fbe63f98-f323-4b06-90f2-5e1680132a10",
+          "text": "AT7: CookOrder",
+          "type": "istar.Task",
+          "x": 1086,
+          "y": 481,
+          "customProperties": {
+            "Description": "",
+            "Params": "order"
+          }
+        },
+        {
+          "id": "bd80c8fc-f270-45f7-838e-5539fc2ee960",
+          "text": "G27: Search for clients who want to order",
+          "type": "istar.Goal",
+          "x": 700,
+          "y": 350,
+          "customProperties": {
+            "Description": "",
+            "GoalType": "Query",
+            "QueriedProperty": "world_db->select(c:Client|c.clientWantsToOrder && !c.clientIsWaitingTable)",
+            "Controls": "clients_wanting_to_order : Sequence(Client)"
+          }
+        },
+        {
+          "id": "9be63358-b2a1-40ab-89a7-f18e8d9b06dc",
+          "text": "G28: Deal with the order",
+          "type": "istar.Goal",
+          "x": 839,
+          "y": 355,
+          "customProperties": {
+            "Description": "",
+            "GoalType": "Achieve",
+            "AchieveCondition": "clients_wanting_to_order->forAll(client|)",
+            "Monitors": "clients_wanting_to_order : Sequence(Client)",
+            "Controls": "client : Client"
+          }
+        },
+        {
+          "id": "38f9453c-45c2-4f7c-ba95-fd245c8aa85f",
+          "text": "G29: Search for the desired order",
+          "type": "istar.Goal",
+          "x": 854,
+          "y": 412,
+          "customProperties": {
+            "Description": "",
+            "GoalType": "Query",
+            "QueriedProperty": "world_db->select(o:Order | o.clientName in client.name)",
+            "Monitors": "client : Client",
+            "Controls": "order : Order"
+          }
+        }
+      ]
+    }
+  ],
+  "orphans": [],
+  "dependencies": [],
+  "links": [
+    {
+      "id": "bca0fe18-9d14-4a30-9e2f-b2b8cac3ff1b",
+      "type": "istar.AndRefinementLink",
+      "source": "ed725278-1f2c-4ab4-be26-68091205bda8",
+      "target": "276dcd56-d179-4aac-9481-0d5fadb83d6e"
+    },
+    {
+      "id": "a791272f-b26e-4aae-964f-fb15cd44b5bf",
+      "type": "istar.AndRefinementLink",
+      "source": "fbe63f98-f323-4b06-90f2-5e1680132a10",
+      "target": "3707617c-9f76-453e-9e5c-34fffdecbcae"
+    },
+    {
+      "id": "decd4bba-f4da-430b-9250-20a3b905ba0f",
+      "type": "istar.AndRefinementLink",
+      "source": "dcf3237d-6ebb-4db1-9a76-4d2ce9d10414",
+      "target": "7fb87fe1-2eb0-422b-9a23-7caf61503015"
+    },
+    {
+      "id": "f95e6cf7-17b6-43df-a092-fc0401cc5162",
+      "type": "istar.AndRefinementLink",
+      "source": "3ef89b5f-c62d-4dec-9f96-2601238856be",
+      "target": "9c364468-2414-4b4e-914f-1cc9c07e4a48"
+    },
+    {
+      "id": "954fe040-4bb7-448f-a58f-048b09152f76",
+      "type": "istar.AndRefinementLink",
+      "source": "7a981b23-0acd-4e7e-8bef-fee541208b14",
+      "target": "9c364468-2414-4b4e-914f-1cc9c07e4a48"
+    },
+    {
+      "id": "dfdce1e0-3f62-43c8-bacc-350986ccb0e7",
+      "type": "istar.OrRefinementLink",
+      "source": "d61aacc7-30da-4446-9b64-f6f42ce8b02d",
+      "target": "a983cdab-d08c-4156-9d1b-65ecd0062041"
+    },
+    {
+      "id": "c6e0f8f3-2f9a-4818-b705-f1ecd2d64844",
+      "type": "istar.OrRefinementLink",
+      "source": "5a4a1465-b989-4114-ad11-e7cdfe20d769",
+      "target": "a983cdab-d08c-4156-9d1b-65ecd0062041"
+    },
+    {
+      "id": "ab755f1b-25f3-4692-9a16-d7960d555454",
+      "type": "istar.AndRefinementLink",
+      "source": "753da51e-d2d7-4ad8-8d67-ba72a785a7d6",
+      "target": "e4638527-5db9-4de2-a531-2f1a2ab3a511"
+    },
+    {
+      "id": "bfb4e9c2-8562-491d-bce3-46b7b1d32ed8",
+      "type": "istar.AndRefinementLink",
+      "source": "7b84568f-e8df-4721-b79b-dafb6eaa6737",
+      "target": "e4638527-5db9-4de2-a531-2f1a2ab3a511"
+    },
+    {
+      "id": "fe730437-0ff1-433a-9bd7-283ebe718d26",
+      "type": "istar.AndRefinementLink",
+      "source": "da067380-cb98-4512-bae1-a2d91ba9b36d",
+      "target": "5a4a1465-b989-4114-ad11-e7cdfe20d769"
+    },
+    {
+      "id": "329a4887-a5e4-43c4-94d5-a1af1fc53724",
+      "type": "istar.AndRefinementLink",
+      "source": "e13d5569-fbae-4324-acac-da306bc06240",
+      "target": "5a4a1465-b989-4114-ad11-e7cdfe20d769"
+    },
+    {
+      "id": "18a8dfcc-0d2b-42bc-b33a-29cbd5760830",
+      "type": "istar.AndRefinementLink",
+      "source": "d0dc06a3-e584-4150-934b-eb14f700ce6b",
+      "target": "d61aacc7-30da-4446-9b64-f6f42ce8b02d"
+    },
+    {
+      "id": "af92601f-98ab-4399-97ab-5d268073b4a6",
+      "type": "istar.AndRefinementLink",
+      "source": "17ef58d0-21f0-4cd4-84ed-f4f6e06a8e5a",
+      "target": "d61aacc7-30da-4446-9b64-f6f42ce8b02d"
+    },
+    {
+      "id": "da235e07-8704-45fe-9236-bd3a82b7b425",
+      "type": "istar.AndRefinementLink",
+      "source": "a714c3ae-afba-481f-843c-8c1f2e653f6f",
+      "target": "7a981b23-0acd-4e7e-8bef-fee541208b14"
+    },
+    {
+      "id": "a7e42866-2a98-4ae9-ba08-beaa37f3dc6e",
+      "type": "istar.AndRefinementLink",
+      "source": "90f20c7e-10ee-4d3e-ad8a-d08f6fd14ab9",
+      "target": "7a981b23-0acd-4e7e-8bef-fee541208b14"
+    },
+    {
+      "id": "8718dc17-1883-4f4a-abe1-244d0672f36b",
+      "type": "istar.AndRefinementLink",
+      "source": "70b14b88-d303-449c-8ab8-3b226fe7665b",
+      "target": "a714c3ae-afba-481f-843c-8c1f2e653f6f"
+    },
+    {
+      "id": "ab69efb6-3e6a-40b0-8873-290cd9fd4072",
+      "type": "istar.AndRefinementLink",
+      "source": "114ed2ca-087c-4c75-ad48-cb3f099969ce",
+      "target": "90f20c7e-10ee-4d3e-ad8a-d08f6fd14ab9"
+    },
+    {
+      "id": "7a934e11-80f8-4ba2-aa76-ed4217fadc2b",
+      "type": "istar.AndRefinementLink",
+      "source": "88bcd340-cb15-41d4-91a4-057a1c8e3311",
+      "target": "17ef58d0-21f0-4cd4-84ed-f4f6e06a8e5a"
+    },
+    {
+      "id": "9e24516b-d2dd-4e1d-bbb5-e9f3f0d151bc",
+      "type": "istar.AndRefinementLink",
+      "source": "03357ebd-c036-4884-9f34-0fb2278623d0",
+      "target": "e13d5569-fbae-4324-acac-da306bc06240"
+    },
+    {
+      "id": "c27d6760-98e1-4576-9689-74030bd31a8e",
+      "type": "istar.AndRefinementLink",
+      "source": "9c364468-2414-4b4e-914f-1cc9c07e4a48",
+      "target": "753da51e-d2d7-4ad8-8d67-ba72a785a7d6"
+    },
+    {
+      "id": "51ba6e7b-dc6d-42d9-9edc-d85c3ca5256e",
+      "type": "istar.AndRefinementLink",
+      "source": "9af17d1d-1c2f-41d6-902f-e42bbcc29e98",
+      "target": "753da51e-d2d7-4ad8-8d67-ba72a785a7d6"
+    },
+    {
+      "id": "025fcfc1-9cc2-41f7-8cd7-e45c8b2a41b4",
+      "type": "istar.AndRefinementLink",
+      "source": "6abf89bc-127c-43b3-a377-1e0707b81cb3",
+      "target": "7b84568f-e8df-4721-b79b-dafb6eaa6737"
+    },
+    {
+      "id": "eff7d96c-b71c-4173-82ce-2709bf11cbbb",
+      "type": "istar.AndRefinementLink",
+      "source": "a983cdab-d08c-4156-9d1b-65ecd0062041",
+      "target": "7b84568f-e8df-4721-b79b-dafb6eaa6737"
+    },
+    {
+      "id": "9f1e5325-587b-40a3-8a2a-a663bd30c4f1",
+      "type": "istar.AndRefinementLink",
+      "source": "8dfdab47-2ac3-4d21-b353-c451e26ca6ff",
+      "target": "7b84568f-e8df-4721-b79b-dafb6eaa6737"
+    },
+    {
+      "id": "a4db225c-2426-4acd-91c7-571f44d01203",
+      "type": "istar.AndRefinementLink",
+      "source": "bd80c8fc-f270-45f7-838e-5539fc2ee960",
+      "target": "8dfdab47-2ac3-4d21-b353-c451e26ca6ff",
+      "name": "M2: undefined"
+    },
+    {
+      "id": "8d8c4281-d108-4967-bf05-e0e50ce376c7",
+      "type": "istar.AndRefinementLink",
+      "source": "3707617c-9f76-453e-9e5c-34fffdecbcae",
+      "target": "9be63358-b2a1-40ab-89a7-f18e8d9b06dc",
+      "name": "M2: undefined"
+    },
+    {
+      "id": "6abf67f5-3497-4d45-a002-1f7a20a628bc",
+      "type": "istar.AndRefinementLink",
+      "source": "7fb87fe1-2eb0-422b-9a23-7caf61503015",
+      "target": "9be63358-b2a1-40ab-89a7-f18e8d9b06dc",
+      "name": "M3: undefined"
+    },
+    {
+      "id": "d3fe8d5b-b5c2-4a91-bcae-36fc42acc586",
+      "type": "istar.AndRefinementLink",
+      "source": "9be63358-b2a1-40ab-89a7-f18e8d9b06dc",
+      "target": "8dfdab47-2ac3-4d21-b353-c451e26ca6ff",
+      "name": "M4: undefined"
+    },
+    {
+      "id": "74b77a77-9229-47ba-a411-b0afae324199",
+      "type": "istar.AndRefinementLink",
+      "source": "38f9453c-45c2-4f7c-ba95-fd245c8aa85f",
+      "target": "9be63358-b2a1-40ab-89a7-f18e8d9b06dc",
+      "name": "M2: undefined"
+    },
+    {
+      "id": "d8f0fa04-2567-4ad2-b9c9-9886bcff5cad",
+      "type": "istar.AndRefinementLink",
+      "source": "276dcd56-d179-4aac-9481-0d5fadb83d6e",
+      "target": "9be63358-b2a1-40ab-89a7-f18e8d9b06dc",
+      "name": "M2: undefined"
+    }
+  ],
+  "display": {
+    "7fb87fe1-2eb0-422b-9a23-7caf61503015": {
+      "width": 93,
+      "height": 35.234375
+    },
+    "9c364468-2414-4b4e-914f-1cc9c07e4a48": {
+      "width": 100,
+      "height": 48.234375
+    },
+    "a983cdab-d08c-4156-9d1b-65ecd0062041": {
+      "width": 112,
+      "height": 56.734375
+    },
+    "9af17d1d-1c2f-41d6-902f-e42bbcc29e98": {
+      "width": 106,
+      "height": 40.234375
+    },
+    "5a4a1465-b989-4114-ad11-e7cdfe20d769": {
+      "width": 101,
+      "height": 56.234375
+    },
+    "d61aacc7-30da-4446-9b64-f6f42ce8b02d": {
+      "width": 109,
+      "height": 52.234375
+    },
+    "3ef89b5f-c62d-4dec-9f96-2601238856be": {
+      "width": 95,
+      "height": 44.234375
+    },
+    "a714c3ae-afba-481f-843c-8c1f2e653f6f": {
+      "width": 102,
+      "height": 56.234375
+    },
+    "d0dc06a3-e584-4150-934b-eb14f700ce6b": {
+      "width": 99,
+      "height": 46.234375
+    },
+    "da067380-cb98-4512-bae1-a2d91ba9b36d": {
+      "width": 121,
+      "height": 52.734375
+    },
+    "17ef58d0-21f0-4cd4-84ed-f4f6e06a8e5a": {
+      "width": 103,
+      "height": 54.234375
+    },
+    "6abf89bc-127c-43b3-a377-1e0707b81cb3": {
+      "width": 108,
+      "height": 61.234375
+    },
+    "114ed2ca-087c-4c75-ad48-cb3f099969ce": {
+      "width": 108,
+      "height": 42.234375
+    },
+    "70b14b88-d303-449c-8ab8-3b226fe7665b": {
+      "width": 108,
+      "height": 47.234375
+    },
+    "bd80c8fc-f270-45f7-838e-5539fc2ee960": {
+      "width": 106,
+      "height": 49.734375
+    },
+    "38f9453c-45c2-4f7c-ba95-fd245c8aa85f": {
+      "width": 88,
+      "height": 50.734375
+    }
+  },
+  "tool": "pistar.2.1.0",
+  "istar": "2.0",
+  "saveDate": "Tue, 24 Feb 2026 23:33:43 GMT",
+  "diagram": {
+    "width": 2000,
+    "height": 1300,
+    "customProperties": {
+      "Description": ""
+    }
+  }
+}

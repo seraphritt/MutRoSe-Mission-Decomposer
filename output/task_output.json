@@ -1,0 +1,116 @@
+{
+    "actions": [
+        {
+            "name": "clean-table",
+            "capabilities": "table-cleaning"
+        },
+        {
+            "name": "wipe-table",
+            "capabilities": "table-cleaning"
+        }
+    ],
+    "tasks": {
+        "t0": {
+            "id": "AT2_1|1",
+            "name": "TakeOffDishes",
+            "arguments": {
+                "?r": "CleanerRobot",
+                "?t": "table"
+            },
+            "arguments_values": {
+                "?r": "",
+                "?t": ""
+            },
+            "locations": "",
+            "robots_num": {
+                "fixed": "True",
+                "num": "1"
+            },
+            "preconditions": [
+                {
+                    "predicate": "?t.tableHasDishes",
+                    "vars": "?t",
+                    "var_types": "table"
+                },
+                {
+                    "predicate": "not ?t.occupied",
+                    "vars": "?t",
+                    "var_types": "table"
+                }
+            ],
+            "effects": [
+                {
+                    "predicate": "not ?t.tableHasDishes",
+                    "vars": "?t",
+                    "var_types": "table"
+                }
+            ],
+            "triggering_events": "",
+            "decomposition": {
+                "a0": {
+                    "name": "clean-table",
+                    "arguments": "?r ?t"
+                }
+            },
+            "group": "True",
+            "divisible": "True"
+        },
+        "t1": {
+            "id": "AT1_1|1",
+            "name": "WipeTable",
+            "arguments": {
+                "?r": "CleanerRobot",
+                "?t": "table"
+            },
+            "arguments_values": {
+                "?r": "",
+                "?t": ""
+            },
+            "locations": "",
+            "robots_num": {
+                "fixed": "True",
+                "num": "1"
+            },
+            "preconditions": [
+                {
+                    "predicate": "not ?t.tableIsClean",
+                    "vars": "?t",
+                    "var_types": "table"
+                },
+                {
+                    "predicate": "not ?t.tableHasDishes",
+                    "vars": "?t",
+                    "var_types": "table"
+                },
+                {
+                    "predicate": "not ?t.occupied",
+                    "vars": "?t",
+                    "var_types": "table"
+                }
+            ],
+            "effects": [
+                {
+                    "predicate": "?t.tableIsClean",
+                    "vars": "?t",
+                    "var_types": "table"
+                }
+            ],
+            "triggering_events": "",
+            "decomposition": {
+                "a0": {
+                    "name": "wipe-table",
+                    "arguments": "?r ?t"
+                }
+            },
+            "group": "True",
+            "divisible": "True"
+        }
+    },
+    "constraints": "",
+    "mission_decompositions": [
+        [
+            "t0",
+            "t1"
+        ]
+    ]
+}
